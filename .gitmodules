@@ -1,0 +1,3 @@
+[submodule "PySLMPClient"]
+	path = PySLMPClient
+	url = https://github.com/tanupoo/PySLMPClient.git
