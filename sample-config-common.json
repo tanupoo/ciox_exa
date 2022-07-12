@@ -1,0 +1,65 @@
+{
+    "Constants": {
+        "HOMEDIR": "ENV:IOX_EXA_HOME"
+    },
+    "Points": {
+        "P0005215": {
+            "SiteName": "朝霞第3工場",
+            "Location": "第1ラインエリアC",
+            "DeviceName": "プレス機A",
+            "ValueName": "使用電力15分積算値",
+            "IntegrationTime": "1",
+            "Unit": "kWh"
+        }
+    },
+    "Servers": [
+        {
+            "ServerID": "TEST-B",
+            "EPR": "https://localhost/api/meter-values",
+            "Version": "1",
+            "ServerAuthInfo": {
+            },
+            "ClientAuthInfo": {
+            },
+            "PostInterval": 60,
+            "Points": [
+                "P0005215"
+            ]
+        }
+    ],
+    "Targets": [
+        {
+            "TargetID": "R120CPU-00123",
+            "Points": [
+                { "PointID": "P0005215", "DeviceCode": "D", "Position": 1 }
+            ],
+            "Protocol": "SLMP",
+            "PullInterval": 5,
+            "RetryInterval": 1,
+            "RetryCount": 2,
+            "IntegrationMarginTime": 0,
+            "IPAddr": "127.0.0.1",
+            "IPPort": 1025,
+            "Transport":  "UDP",
+            "PDUType": "ST",
+            "Encode": "binary",
+            "NetNo": "0x00",
+            "NodeNo": "0xff",
+            "DstProcNo": "0x3fff",
+            "Timer": 4,
+            "Command": "0401",
+            "SubCommand": "0000",
+            "DevCode": "D",
+            "ReadStart": 1,
+            "ReadCount": 5
+        }
+    ],
+    "AgentDB": {
+        "IPAddr": "localhost",
+        "IPPort": 6379
+    },
+    "QueDB": {
+        "IPAddr": "localhost",
+        "IPPort": 6379
+    }
+}

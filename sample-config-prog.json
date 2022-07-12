@@ -1,0 +1,5 @@
+{
+    "CommonConfigFile" : "sample-config-common.json",
+    "EnableDebug" : false,
+    "LogFile" : "agent.log"
+}
