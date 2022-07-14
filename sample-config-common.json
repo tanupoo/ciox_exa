@@ -8,20 +8,27 @@
             "Location": "第1ラインエリアC",
             "DeviceName": "プレス機A",
             "ValueName": "使用電力15分積算値",
-            "IntegrationTime": "1",
-            "Unit": "kWh"
+            "Unit": "kWh",
+            "IntegrationSpan": "900"
+        },
+        "朝霞18-2:室内温度": {
+            "SiteName": "朝霞第18工場",
+            "Location": "第2開発室",
+            "DeviceName": "",
+            "ValueName": "室内温度",
+            "Unit": "℃",
+            "Integration": false
         }
     },
     "Servers": [
         {
             "ServerID": "TEST-B",
             "EPR": "https://localhost/api/meter-values",
-            "Version": "1",
+            "Version": "0",
             "ServerAuthInfo": {
             },
             "ClientAuthInfo": {
             },
-            "PostInterval": 60,
             "Points": [
                 "P0005215"
             ]
@@ -37,7 +44,6 @@
             "PullInterval": 5,
             "RetryInterval": 1,
             "RetryCount": 2,
-            "IntegrationMarginTime": 0,
             "IPAddr": "127.0.0.1",
             "IPPort": 1025,
             "Transport":  "UDP",

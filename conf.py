@@ -113,6 +113,8 @@ def parse_config(prog_name, args=None):
     config.logger = get_logger(prog_name,
                                log_file=config0.LogFile,
                                debug_mode=config0.EnableDebug)
+    # set debug flag
+    config.debug = config0.EnableDebug
     return config
 
 if __name__ == "__main__":

@@ -6,10 +6,11 @@ class PointInfo(BaseModel):
     Location: str
     DeviceName: str
     ValueName: str
-    ValueType: Literal["float", "int"] = "float"
-    ULimitRNumber: int = 100
     Unit: str
-    IntegrationTime: Optional[int]
+    ValueType: Literal["float", "int"] = "float"
+    ULimitRotationNumber: int = 100
+    Integration: bool = True
+    IntegrationSpan: int = 1800
 
 class ServerAuthCertInfo(BaseModel):
     CertRootChainFile: Optional[str]
@@ -33,7 +34,10 @@ class ServerInfo(BaseModel):
     Version: str
     ServerAuthInfo: Optional[ServerAuthCertInfo]
     ClientAuthInfo: Optional[ClientAuthTypeInfo]
-    PostInterval: int
+    PostTimeBase: str = "00:00:00"
+    PostInterval: int = 21600
+    IntegrationDeferTime: int = 600
+    IntegrationMarginTime: int = 30
     Timeout: int = 15
     Compression: bool = False
     Points: List[str]
@@ -49,7 +53,6 @@ class TargetInfo(BaseModel):
     Protocol: str
     PullInterval: int
     RetryInterval: int
-    integration_margin: int=30
     RetryCount: int
     IPAddr: str
     IPPort: int

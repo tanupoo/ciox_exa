@@ -42,12 +42,12 @@ if __name__ == "__main__":
 
     print(ServerPostModel.parse_obj(data))
 
-    data = [{'PointID': 'P0005215', 'Values': [None],
+    data = [{'pointID': 'P0005215', 'Values': [None],
              'TSLastValue': '2022-07-12T14:29:55+09:00'},
-            {'PointID': 'P0005216', 'Values': [None],
+            {'pointID': 'P0005216', 'Values': [None],
              'TSLastValue': '2022-07-12T14:29:55+09:00'},
-            {'PointID': '06_78_90:XA', 'Values': [None],
+            {'pointID': '06_78_90:XA', 'Values': [None],
              'TSLastValue': '2022-07-12T14:29:55+09:00'},
-            {'PointID': '06_78_91:XB', 'Values': [None],
+            {'pointID': '06_78_91:XB', 'Values': [None],
              'TSLastValue': '2022-07-12T14:29:55+09:00'}]
     print(ServerPostModel(Data=data))

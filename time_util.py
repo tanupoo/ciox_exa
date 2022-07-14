@@ -6,6 +6,7 @@ tz_info = dateutil.tz.gettz("Asia/Tokyo")
 
 def get_time_isoformat(dt=None, ts=None):
     """
+    either dt or ts is required.
     return isoformat **WITHOUT** microseconds.
     """
     if dt is not None:
@@ -26,36 +27,61 @@ def get_time_now(margin=0):
     else:
         return now
 
+def get_sharp_timestamp(xi, ts0=None, prev=True):
+    """
+    xi: integration span.
+    ts0: base timestamp.
+    prev:
+        False: return timestamp of the next shart time.
+        True: return timestamp of the previous shart time.
+    e.g. (xi, prev) = (30, False), returns the latest of 30 seconds.
+    """
+    if ts0 is None:
+        ts0 = get_time_now().timestamp()
+    if prev is True:
+        return ts0//xi*xi
+    else:
+        return (ts0+xi)//xi*xi
+
+def get_prev_sharp_time(xi, ts0=None):
+    """
+    xi: interval. e.g. 30 means to calculate seconds to previous 30 seconds.
+    ts0: base timestamp.
+    NOTE: timestamp must be aware-time.
+    """
+    return datetime.fromtimestamp(get_sharp_timestamp(xi, ts0, prev=True),
+                                  tz=tz_info)
+
 def get_next_sharp_time(xi, ts0=None):
     """
     xi: interval. e.g. 30 means to calculate seconds to next 30 seconds.
     ts0: base timestamp.
     NOTE: timestamp must be aware-time.
     """
-    if ts0 is None:
-        ts0 = get_time_now().timestamp()
-    return datetime.fromtimestamp((ts0+xi)//xi*xi, tz=tz_info)
+    return datetime.fromtimestamp(get_sharp_timestamp(xi, ts0, prev=False),
+                                  tz=tz_info)
 
-def get_sleep_time(xi):
+def get_sleep_time(xi, margin=0):
     """
     xi: interval. e.g. 30 means to calculate seconds to next 30 seconds.
     """
     n = get_time_now()
     t = get_next_sharp_time(xi)
-    return t.timestamp() - n.timestamp()
+    return t.timestamp() - n.timestamp() + margin
 
 if __name__ == "__main__":
     import time
     import dateutil.parser
-    x = get_next_sharp_time(3600)   # next 1 hour
-    print(x.isoformat())
-    a = datetime.fromtimestamp(time.time(), tz=tz_info)
-    c = datetime.now(tz_info)
-    b = datetime.now()
-    print(a.isoformat())
-    print(c.isoformat())
-    print(b.isoformat())
-    #
-    dt = dateutil.parser.parse("2022-07-09T22:21:00.083802+09:00")
-    print(" ts0:", dt.isoformat())
-    print("next:", get_next_sharp_time(3600, dt.timestamp()).isoformat())
+    print("current:", get_time_isoformat())
+    print("   prev:", get_prev_sharp_time(3600).isoformat())
+    print("   next:", get_next_sharp_time(3600).isoformat())
+    testv = [
+            # span, isots
+            (60, "2022-07-07 12:31:02.000826"),
+            ]
+    for t in testv:
+        span = t[0]
+        dt = dateutil.parser.parse(t[1])
+        print(testv, "==>",
+              datetime.fromtimestamp(get_sharp_timestamp(span, dt.timestamp(),
+                                                         prev=True)))
