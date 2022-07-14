@@ -8,25 +8,16 @@ from model_config import *
 
 __env_vars = {
     "agent_man": {
-        "common_config_file": "IOX_EXA_COMMON_CONFIG_FILE",
-        "config_file": "IOX_EXA_AM_CONFIG_FILE",
-        "enable_debug": "IOX_EXA_AM_ENABLE_DEBUG",
-        "log_file": "IOX_EXA_AM_LOG_FILE",
-        "log_stdout": "IOX_EXA_AM_LOG_STDOUT",
+        "EnableDebug": "IOX_EXA_AM_ENABLE_DEBUG",
+        "LogFile": "IOX_EXA_AM_LOG_FILE",
     },
     "middle_man": {
-        "common_config_file": "IOX_EXA_COMMON_CONFIG_FILE",
-        "config_file": "IOX_EXA_MM_CONFIG_FILE",
-        "enable_debug": "IOX_EXA_MM_ENABLE_DEBUG",
-        "log_file": "IOX_EXA_MM_LOG_FILE",
-        "log_stdout": "IOX_EXA_MM_LOG_STDOUT",
+        "EnableDebug": "IOX_EXA_MM_ENABLE_DEBUG",
+        "LogFile": "IOX_EXA_MM_LOG_FILE",
     },
     "post_man": {
-        "common_config_file": "IOX_EXA_COMMON_CONFIG_FILE",
-        "config_file": "IOX_EXA_PM_CONFIG_FILE",
-        "enable_debug": "IOX_EXA_PM_NABLE_DEBUG",
-        "log_file": "IOX_EXA_PM_LOG_FILE",
-        "log_stdout": "IOX_EXA_PM_LOG_STDOUT",
+        "EnableDebug": "IOX_EXA_PM_NABLE_DEBUG",
+        "LogFile": "IOX_EXA_PM_LOG_FILE",
     },
 }
 
@@ -51,9 +42,9 @@ def __parse_args(prog_name, args):
     take arguments and overwrite ones if specified.
     """
     ap = ArgumentParser(
-            description="IOX EnergyX {prog_name}.",
+            description="IOx {prog_name}.",
             formatter_class=ArgumentDefaultsHelpFormatter)
-    ap.add_argument("config_file", metavar="CONFIG_FILE",
+    ap.add_argument("-c", action="store", dest="config_file",
                     help="specify the config file.")
     ap.add_argument("-d", action="store_true", dest="enable_debug",
                 default=None,
@@ -61,12 +52,7 @@ def __parse_args(prog_name, args):
     ap.add_argument("-l", action="store", dest="log_file",
                 help="specify the name of the log file.")
     opt = ap.parse_args(args)
-    # set arguments to the env variable to orverwrite the ones.
-    for k,v in [("config_file", opt.config_file),
-                ("enable_debug", opt.enable_debug),
-                ("log_file", opt.log_file)]:
-        if v is not None:
-            environ[__env_vars[prog_name][k]] = str(v)
+    return opt
 
 def __get_env_bool(key, default):
     c = environ.get(key)
@@ -87,34 +73,32 @@ def parse_config(prog_name, args=None):
         3. config file.
         4. pydantic
     """
-    if args is not None:
-        __parse_args(prog_name, args)
     env_vars = __env_vars[prog_name]
+    cli_opt  = __parse_args(prog_name, args)
+    if cli_opt.config_file is not None:
+        config_file = cli_opt.config_file
+    else:
+        config_file = environ.get(env_vars["config_file"])
+    if config_file is None:
+        print("ERROR: config file is not specified.")
+        exit(1)
     # load the program config.
-    config_file = environ[env_vars["config_file"]]
     try:
-        config0 = ProgramConfigModel.parse_obj(json.load(open(config_file)))
+        config = CommonConfigModel.parse_obj(json.load(open(config_file)))
     except Exception as e:
         print("ERROR: {} read error. {}".format(config_file, e))
         exit(1)
-    # overwrite the config by the cli options/env variable.
-    for k,v in [("enable_debug", "EnableDebug"),
-                ("log_file", "LogFile")]:
-        if environ.get(env_vars[k]) is not None:
-            setattr(config0, v, environ.get(env_vars[k]))
-    # load the common config.
-    try:
-        config = CommonConfigModel.parse_obj(json.load(open(
-                config0.CommonConfigFile)))
-    except Exception as e:
-        print("ERROR: {} read error. {}".format(config0.CommonConfigFile, e))
-        exit(1)
+    # overwrite the params with the order.
+    for k,v in [("EnableDebug", cli_opt.enable_debug),
+                ("LogFile", cli_opt.log_file)]:
+        if v is not None:
+            setattr(config, k, v)
+        elif environ.get(env_vars[k]) is not None:
+            setattr(config, k, environ.get(env_vars[k]))
     # set logger
     config.logger = get_logger(prog_name,
-                               log_file=config0.LogFile,
-                               debug_mode=config0.EnableDebug)
-    # set debug flag
-    config.debug = config0.EnableDebug
+                               log_file=config.LogFile,
+                               debug_mode=config.EnableDebug)
     return config
 
 if __name__ == "__main__":
