@@ -80,15 +80,9 @@ class CommonConfigModel(BaseModel):
     Targets: List[TargetInfo]
     AgentDB: Optional[DBInfo] = DBInfo()
     QueDB: Optional[DBInfo] = DBInfo()
+    EnableDebug: Optional[bool] = False
+    LogFile: Optional[str] = "daemon.log"
 
     class Config:
         extra = Extra.allow
-
-class ProgramConfigModel(BaseModel):
-    """
-    Entry Model
-    """
-    CommonConfigFile: Optional[str] = "common-config.json"
-    EnableDebug: Optional[bool] = False
-    LogFile: Optional[str] = "daemon.log"
 
