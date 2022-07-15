@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "./PySLMPClient/")
+sys.path.insert(0, sys.path[0]+"/PySLMPClient") # XXX ugly
 
 from pyslmpclient import SLMPClient
 from pyslmpclient.const import DeviceCode
