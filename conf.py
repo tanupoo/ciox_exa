@@ -2,6 +2,7 @@ from pydantic import BaseModel, Extra
 from typing import List, Optional, Union, Dict
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from os import environ
+import os   # XXX
 from get_logger import get_logger
 import json
 from model_config import *
@@ -84,7 +85,8 @@ def parse_config(prog_name, args=None):
         config_file = environ.get(env_vars["ConfigFile"])
         if config_file is None:
             # for IOx
-            config_file = os.getenv("CAF_APP_CONFIG_FILE")
+            config_dir = environ.get("CAF_APP_CONFIG_DIR")
+            config_file = f"{config_dir}/package_config.ini"
     if config_file is None:
         print("ERROR: config file is not specified.")
         exit(1)
