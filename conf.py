@@ -82,6 +82,9 @@ def parse_config(prog_name, args=None):
         config_file = cli_opt.config_file
     else:
         config_file = environ.get(env_vars["ConfigFile"])
+        if config_file is None:
+            # for IOx
+            config_file = os.getenv("CAF_APP_CONFIG_FILE")
     if config_file is None:
         print("ERROR: config file is not specified.")
         exit(1)
