@@ -8,14 +8,17 @@ from model_config import *
 
 __env_vars = {
     "agent_man": {
+        "ConfigFile": "IOX_EXA_CONFIG_FILE",
         "EnableDebug": "IOX_EXA_AM_ENABLE_DEBUG",
         "LogFile": "IOX_EXA_AM_LOG_FILE",
     },
     "middle_man": {
+        "ConfigFile": "IOX_EXA_CONFIG_FILE",
         "EnableDebug": "IOX_EXA_MM_ENABLE_DEBUG",
         "LogFile": "IOX_EXA_MM_LOG_FILE",
     },
     "post_man": {
+        "ConfigFile": "IOX_EXA_CONFIG_FILE",
         "EnableDebug": "IOX_EXA_PM_NABLE_DEBUG",
         "LogFile": "IOX_EXA_PM_LOG_FILE",
     },
@@ -78,7 +81,7 @@ def parse_config(prog_name, args=None):
     if cli_opt.config_file is not None:
         config_file = cli_opt.config_file
     else:
-        config_file = environ.get(env_vars["config_file"])
+        config_file = environ.get(env_vars["ConfigFile"])
     if config_file is None:
         print("ERROR: config file is not specified.")
         exit(1)
