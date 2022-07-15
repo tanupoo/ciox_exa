@@ -81,7 +81,7 @@ class CommonConfigModel(BaseModel):
     AgentDB: DBInfo = DBInfo()
     QueDB: DBInfo = DBInfo()
     EnableDebug: bool = False
-    LogFile: str = "daemon.log"
+    LogFile: str = "syslog"
     SyslogAddr: str = "localhost"
     SyslogPort: int = 514
 
