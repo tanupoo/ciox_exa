@@ -67,5 +67,7 @@
     "QueDB": {
         "IPAddr": "localhost",
         "IPPort": 6379
-    }
+    },
+    "SyslogAddr": "127.0.0.1",
+    "SyslogPort": 8514
 }
