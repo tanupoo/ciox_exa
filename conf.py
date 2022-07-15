@@ -98,7 +98,9 @@ def parse_config(prog_name, args=None):
     # set logger
     config.logger = get_logger(prog_name,
                                log_file=config.LogFile,
-                               debug_mode=config.EnableDebug)
+                               debug_mode=config.EnableDebug,
+                               syslog=(config.SyslogAddr, config.SyslogPort))
+
     return config
 
 if __name__ == "__main__":

@@ -78,10 +78,12 @@ class CommonConfigModel(BaseModel):
     Points: Dict[str, PointInfo]
     Servers: List[ServerInfo]
     Targets: List[TargetInfo]
-    AgentDB: Optional[DBInfo] = DBInfo()
-    QueDB: Optional[DBInfo] = DBInfo()
-    EnableDebug: Optional[bool] = False
-    LogFile: Optional[str] = "daemon.log"
+    AgentDB: DBInfo = DBInfo()
+    QueDB: DBInfo = DBInfo()
+    EnableDebug: bool = False
+    LogFile: str = "daemon.log"
+    SyslogAddr: str = "localhost"
+    SyslogPort: int = 514
 
     class Config:
         extra = Extra.allow
