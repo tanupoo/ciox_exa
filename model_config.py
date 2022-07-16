@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel, Extra, validator
 from typing import List, Optional, Union, Dict, Literal
 
 class PointInfo(BaseModel):
@@ -12,28 +12,38 @@ class PointInfo(BaseModel):
     Integration: bool = True
     IntegrationSpan: int = 1800
 
-class ServerAuthCertInfo(BaseModel):
-    CertRootChainFile: Optional[str]
-
 class AuthCredBasic(BaseModel):
-    UserName: str
+    Username: str
     Password: str
 
 class AuthCredCert(BaseModel):
-    CertFile: Optional[str]
-    KeyFile: Optional[str]
-    RootChainFile: Optional[str]
+    CertFile: str
+    KeyFile: str
+    RootChainFile: str
+
+class ServerAuthCertInfo(BaseModel):
+    CertRootChainFile: str
 
 class ClientAuthTypeInfo(BaseModel):
-    AuthType: Optional[str]
-    AuthInfo: Union[None,AuthCredBasic,AuthCredCert]
+    AuthType: Literal["None", "Basic", "Cert"] = "None"
+    AuthInfo: Optional[Union[AuthCredBasic,AuthCredCert]]
+
+    @validator("AuthInfo")
+    def validate_AuthInfo(cls, v, values):
+        auth_type = values["AuthType"]
+        if (auth_type== "None" or
+            (auth_type == "Basic" and type(v).__name__ == "AuthCredBasic") or
+            (auth_type == "Cert" and type(v).__name__ == "AuthCredCert")):
+            return v
+        else:
+            raise ValueError(f"ERROR: invalid AuthInfo: {v} as {auth_type}")
 
 class ServerInfo(BaseModel):
     ServerID: str
     EPR: str
     Version: str
-    ServerAuthInfo: Optional[ServerAuthCertInfo]
-    ClientAuthInfo: Optional[ClientAuthTypeInfo]
+    ServerAuthInfo: Union[None,Dict,ServerAuthCertInfo]
+    ClientAuthInfo: Union[None,Dict,ClientAuthTypeInfo]
     PostTimeBase: str = "00:00:00"
     PostInterval: int = 21600
     IntegrationDeferTime: int = 600

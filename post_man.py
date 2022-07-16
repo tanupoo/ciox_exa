@@ -20,16 +20,18 @@ def worker(server, config):
     db_que = DBConnector(config.QueDB, config)
     tag = f"Agent:{server.ServerID}: "
     auth = None
-    if server.ClientAuthInfo is None or server.ClientAuthInfo.AuthType is None:
+    if not server.ClientAuthInfo or server.ClientAuthInfo["AuthType"] == "None":
         pass
-    elif server.ClientAuthInfo.AuthType == "Basic":
-        cred = server.ClientAuthInfo.AuthInfo
+    elif server.ClientAuthInfo["AuthType"] == "Basic":
+        cred = server.ClientAuthInfo["AuthInfo"]
         if cred is not None:
-            auth = requests.auth.HTTPBasicAuth(cred.UserName, cred.Password)
+            auth = requests.auth.HTTPBasicAuth(cred["Username"], cred["Password"])
         else:
             raise ValueError(f"{tag}No credentials")
     else:
         raise ValueError(f"authtype not implemented yet, {server.ClientAuthInfo.AuthType}")
+
+    # create header
     if server.Compression is True:
         headers = {
             'Content-Type': 'application/json',
@@ -40,7 +42,7 @@ def worker(server, config):
             'Content-Type': 'application/json',
             }
 
-    #
+    # main loop
     while True:
         config.logger.debug(f"{tag}resumed: {get_time_isoformat()}")
         data = db_que.get_data_ready(server.ServerID)
