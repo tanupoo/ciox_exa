@@ -57,7 +57,7 @@ def make_data(nb_times, sample_span, basetime, nb_points):
             dt += timedelta(seconds=sample_span)
     return data
 
-def test0(data, sumspan, margin, expected):
+def main(data, sumspan, margin, expected):
     """
     data: see the return value of make_data()
     """
@@ -70,60 +70,64 @@ def test0(data, sumspan, margin, expected):
     for pid,svt_list in data.items():
         vsum = diffsum_timespan_sharp(svt_list, sumspan, margin)
         print(pid, vsum)
-        if vsum != expected:
-            raise ValueError(f"ERROR: {vsum} != {expected}")
         print()
+        assert vsum == expected
+        #if vsum != expected:
+        #    raise ValueError(f"ERROR: {vsum} != {expected}")
 
-def test(testv, expected):
+def make_data_and_test(testv, expected):
     sample_span, nb_times, sumspan, margin, nb_points, basetime = testv
     print(f"- Sampl. span = {sample_span} sec, #of data = {nb_times}")
     data = make_data(nb_times, sample_span, basetime, nb_points)
-    test0(data, sumspan, margin, expected)
+    main(data, sumspan, margin, expected)
 
-#
-# test
-#
-testv = [
-    # sample_span, nb_times, sumspan, margin, nb_points
-    ( (10,  1, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  2, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  6, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  7, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
-    ( (10,  8, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
-    ( (10, 12, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
-    ( (10, 13, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 12} ),
-    ( (10, 14, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 12} ),
+def test_even():
+    testv = [
+# sample_span, nb_times, sumspan, margin, nb_points
+( (10,  1, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  2, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  6, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  7, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
+( (10,  8, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
+( (10, 12, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
+( (10, 13, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 12} ),
+( (10, 14, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 12} ),
+        ]
+    for i in range(0,8): make_data_and_test(*testv[i])
 
-    # "2022-07-07T12:30:02.123499+09:00" needs 3 sec as margin.
-    ( (10,  1, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  2, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  6, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  7, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
-    ( (10,  8, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
-    ( (10, 12, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
-    ( (10, 13, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 12} ),
-    ( (10, 14, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 12} ),
+def test_plus2sec():
+    testv = [
+# sample_span, nb_times, sumspan, margin, nb_points
+# "2022-07-07T12:30:02.123499+09:00" needs 3 sec as margin.
+( (10,  1, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  2, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  6, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  7, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
+( (10,  8, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
+( (10, 12, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 6} ),
+( (10, 13, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 12} ),
+( (10, 14, 60, 3, 1, "2022-07-07T12:30:02.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 12} ),
+        ]
+    for i in range(0,8): make_data_and_test(*testv[i])
 
-    # "2022-07-07T12:29:52.123499+09:00"
-    ( (10,  1, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  2, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  3, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  7, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
-    ( (10,  8, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 7} ),
-    ( (10,  9, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 7} ),
-    ( (10, 13, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 7} ),
-    ( (10, 14, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 13} ),
-    ( (10, 15, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 13} ),
-    ( (10, 16, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 13} ),
-    ]
+def test_minus8sec():
+    testv = [
+# sample_span, nb_times, sumspan, margin, nb_points
+# "2022-07-07T12:29:52.123499+09:00"
+( (10,  1, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  2, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  3, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  7, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
+( (10,  8, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 7} ),
+( (10,  9, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 7} ),
+( (10, 13, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0], 'rest_offset': 7} ),
+( (10, 14, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 13} ),
+( (10, 15, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 13} ),
+( (10, 16, 60, 3, 1, "2022-07-07T12:29:52.123499+09:00"), {'vsum_list': [6.0, 6.0], 'rest_offset': 13} ),
+        ]
+    for i in range(0,8): make_data_and_test(*testv[i])
 
-#for i in range(0,8): test(*testv[i])
-#for i in range(8,16): test(*testv[i])
-#for i in range(16,26): test(*testv[i])
-#exit(0)
-
-for i,v in enumerate(testv):
-    print(f"## {i}")
-    test(*v)
-
-#test(60, 11, 300, 1, "2022-07-07T12:00:00.999900+09:00")
+if __name__ == "__main__":
+    test_even()
+    test_plus2sec()
+    test_minus8sec()
