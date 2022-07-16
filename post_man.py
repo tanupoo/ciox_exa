@@ -56,7 +56,7 @@ def worker(server, config):
                 result = requests.post(server.EPR, auth=auth,
                                         timeout=server.Timeout,
                                         headers=headers, json=body)
-            except requests.ConnectionError:
+            except requests.ConnectionError as e:
                 config.logger.error(f"{tag}Connection Error, "
                             f"{server.ServerID}, {e}")
                 db_que.post_data_retx(server.ServerID, data)
