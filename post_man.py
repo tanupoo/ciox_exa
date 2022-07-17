@@ -57,7 +57,7 @@ def worker(server, config):
             try:
                 result = requests.post(server.EPR, auth=auth,
                                         timeout=server.Timeout,
-                                        headers=headers, json=body)
+                                        headers=headers, data=body)
             except requests.ConnectionError as e:
                 config.logger.error(f"{tag}Connection Error, "
                             f"{server.ServerID}, {e}")
