@@ -12,7 +12,7 @@ from diffsum import diffsum_timespan_sharp
 def worker(server, config):
     db_agent = DBConnector(config.AgentDB, config)
     db_que = DBConnector(config.QueDB, config)
-    tag = f"Agent:{server.ServerID}: "
+    tag = f"Mid:{server.ServerID}: "
     while True:
         config.logger.debug(f"{tag}resumed: {get_time_isoformat()}")
         cur_ts = get_time_now().timestamp()
