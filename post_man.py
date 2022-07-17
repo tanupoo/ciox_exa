@@ -18,7 +18,7 @@ https://requests.readthedocs.io/en/latest/user/advanced/#session-objects
 """
 def worker(server, config):
     db_que = DBConnector(config.QueDB, config)
-    tag = f"Agent:{server.ServerID}: "
+    tag = f"Post:{server.ServerID}: "
     auth = None
     if not server.ClientAuthInfo or server.ClientAuthInfo["AuthType"] == "None":
         pass
