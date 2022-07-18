@@ -113,6 +113,7 @@ class DBConnector:
 
     def get_data_ready(self, server_id):
         """
+        return all record marked to READY and bound to the server_id.
         """
         return self._get_data_queue(self.get_key_ready(server_id))
 
@@ -124,4 +125,7 @@ class DBConnector:
         self._post_data_queue(key, out_data)
 
     def get_data_retx(self, server_id):
+        """
+        return all record marked to RETRY and bound to the server_id.
+        """
         return self._get_data_queue(self.get_key_retx(server_id))
