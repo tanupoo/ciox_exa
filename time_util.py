@@ -19,7 +19,8 @@ def get_time_isoformat(dt=None, ts=None):
 
 def get_time_now(margin=0):
     """
-    return datetime
+    return datetime of current.
+    margin: the number in seconds adding the current time.
     """
     now = datetime.now(tz=tz_info)
     if margin != 0:
