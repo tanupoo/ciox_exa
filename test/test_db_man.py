@@ -45,6 +45,7 @@ def test_post_data_raw_basic():
 def test_post_data_raw_content():
     data = [("MONO-215", -1)]
     db = setup_db()
+    assert db is not False
     clear_db(db)
     ret = db.post_data_raw(data)
     assert ret == 1
@@ -62,6 +63,8 @@ def test_post_data_raw_content():
 def test_post_data_raw_None():
     data = [(None, -1)]
     db = setup_db()
+    assert db is not False
+    clear_db(db)
     assert db.post_data_raw(data) == False
     #
     # XXX need redis.close()???
@@ -70,6 +73,8 @@ def test_post_data_raw_None():
 def test_get_data_raw():
     data = [("MONO-215", -1), ("ROT-P216", 30), ("温度", 20), ("稼働中", True) ]
     db = setup_db()
+    assert db is not False
+    clear_db(db)
     if db.post_data_raw(data):
         ret = db.get_data_raw([p[0] for p in data],
                                get_time_now().timestamp())
@@ -79,17 +84,23 @@ def test_get_data_raw():
 
 def test_get_data_raw_None():
     db = setup_db()
+    assert db is not False
+    clear_db(db)
     ret = db.get_data_raw(None, get_time_now().timestamp())
     assert ret == False
 
 def test_get_data_Nothing():
     db = setup_db()
+    assert db is not False
+    clear_db(db)
     ret = db.get_data_raw([], get_time_now().timestamp())
     assert ret == {}
 
 def test_del_data_raw():
     data = [("MONO-215", -1), ("ROT-P216", 30), ("温度", 20), ("稼働中", True) ]
     db = setup_db()
+    assert db is not False
+    clear_db(db)
     if db.post_data_raw(data):
         ret = db.del_data_raw([p[0] for p in data],
                             get_time_now().timestamp())
@@ -99,6 +110,8 @@ def test_del_data_raw():
 
 def test_del_data_raw_False():
     db = setup_db()
+    assert db is not False
+    clear_db(db)
     ret = db.del_data_raw("NO-DATA", get_time_now().timestamp())
     assert ret == False
 
