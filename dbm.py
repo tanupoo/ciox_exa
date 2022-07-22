@@ -4,21 +4,9 @@ from argparse import ArgumentParser
 import redis
 
 def main(opt):
-    con = redis.Redis(host=opt.ip_addr, port=opt.ip_port)
 
-    if opt.name == "all":
-        it = con.scan_iter()
-    else:
-        it = con.scan_iter(f"{opt.name}:*")
-
-    if opt.delete_name:
-        if opt.name == "all":
-            print("ERROR: 'all' is not acceptable. use the -n option.")
-            exit(0)
-        for k in con.scan_iter(f"{opt.name}:*"):
-            con.delete(k)
-    else:
-        for rkey in it:
+    def get_each(iterator):
+        for rkey in iterator:
             ktype = con.type(rkey)
             if ktype == b'zset':
                 for rv in con.zscan_iter(rkey):
@@ -30,14 +18,32 @@ def main(opt):
             else:
                 print(con.type(rkey), rkey.decode())
 
+    con = redis.Redis(host=opt.ip_addr, port=opt.ip_port)
+
+    if opt.delete_name:
+        if "all" in opt.names:
+            print("ERROR: 'all' is not acceptable. use the -n option.")
+            exit(1)
+        for name in opt.names:
+            for k in con.scan_iter(f"{name}:*"):
+                n = con.delete(k)
+                print(f"{n} record deleted.")
+    else:
+        if "all" in opt.names:
+            get_each(con.scan_iter())
+        else:
+            for name in opt.names:
+                get_each(con.scan_iter(f"{name}:*"))
+
 #
 # main
 #
 ap = ArgumentParser(description="redis viewer")
-ap.add_argument("-n", action="store", dest="name",
+ap.add_argument("-n", action="store", dest="names",
                 default="all",
+                nargs="+",
                 choices=["all", "pt", "rdy", "retx"],
-                help="specify a category name.")
+                help="specify the category name list.")
 ap.add_argument("--delete", action="store_true", dest="delete_name",
                 help="delete entries in the specified category")
 ap.add_argument("-a", action="store", dest="ip_addr",
