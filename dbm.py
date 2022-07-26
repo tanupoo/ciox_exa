@@ -43,7 +43,7 @@ ap.add_argument("-n", action="store", dest="names",
                 default="all",
                 nargs="+",
                 choices=["all", "pt", "rdy", "retx"],
-                help="specify the category name list.")
+                help="specify the category name list. e.g. -n rdy retx")
 ap.add_argument("--delete", action="store_true", dest="delete_name",
                 help="delete entries in the specified category")
 ap.add_argument("-a", action="store", dest="ip_addr",
