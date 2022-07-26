@@ -16,8 +16,8 @@ import json
 Requests Auth
 https://requests.readthedocs.io/en/latest/user/advanced/#session-objects
 """
+
 def worker(server, config):
-    db_que = DBConnector(config.QueDB, config)
     tag = f"Post:{server.ServerID}: "
     auth = None
     if not server.ClientAuthInfo or server.ClientAuthInfo["AuthType"] == "None":
@@ -42,40 +42,67 @@ def worker(server, config):
             'Content-Type': 'application/json',
             }
 
-    # main loop
-    while True:
-        config.logger.debug(f"{tag}resumed: {get_time_isoformat()}")
-        data = db_que.get_data_ready(server.ServerID)
-        if len(data) > 0:
+    # common process, but getting from the different db.
+    def try_post_data(func_get_data):
+        while True:
+            try:
+                data = func_get_data(server.ServerID)
+            except db.ConnectionError as e:
+                return False
+            if len(data) == 0:
+                # end of process in this time.
+                break
+            # preparing the post data.
             xd = ServerPostModel(Data=data).dict()
-            # XXX create data
+            # XXX compression is needed ?
             if server.Compression is True:
                 body = gzip.compress(json.dumps(xd).encode())
             else:
                 body = json.dumps(xd)
-            # Send the request.
+            # Send the data.
+            success = False
             try:
-                result = requests.post(server.EPR, auth=auth,
+                resp = requests.post(server.EPR, auth=auth,
                                         timeout=server.Timeout,
                                         headers=headers, data=body)
             except requests.ConnectionError as e:
                 config.logger.error(f"{tag}Connection Error, "
                             f"{server.ServerID}, {e}")
-                db_que.post_data_retx(server.ServerID, data)
             except requests.Timeout as e:
                 config.logger.error(f"{tag}connection timeout, "
                             f"{server.ServerID}, {e}")
-                db_que.post_data_retx(server.ServerID, data)
             except Exception as e:
-                config.logger.critical(f"{tag}system error, "
+                config.logger.error(f"{tag}system error, "
                             f"{server.ServerID}, {e}")
             else:
-                if result.status_code == requests.codes.ok:
+                if resp.status_code == requests.codes.ok:
                     config.logger.debug(f"{tag}submission successful.")
+                    success = True
                 else:
-                    config.logger.debug(f"{tag}submission failed with code {result.status_code}.")
-                    db_que.post_data_retx(server.ServerID, data)
-        # sleep
+                    config.logger.error(f"{tag}submission failed with code {resp.status_code}.")
+            # post the data for retrying
+            if success is not True:
+                try:
+                    db.post_data_retx(server.ServerID, data)
+                except db.ConnectionError as e:
+                    pass
+                else:
+                    config.logger.debug(f"{tag}posted data to retry queue: {data}")
+                # stop the process if any error occured.
+                return False
+            else:
+                # interval for the next data.
+                time.sleep(1)
+        return True
+
+    # main loop
+    while True:
+        config.logger.debug(f"{tag}resumed: {get_time_isoformat()}")
+        db = DBConnector(config.QueDB, config)
+        dataset = [db, server, db.get_data_ready]
+        if try_post_data(db.get_data_ready) is True:
+            # only successful.
+            try_post_data(db.get_data_retx)
         config.logger.debug(f"{tag}sleep: {get_time_isoformat()}")
         time.sleep(get_sleep_time(server.PostInterval))
 
