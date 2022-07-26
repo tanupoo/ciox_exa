@@ -155,9 +155,8 @@ class DBConnector:
         delete_count = 0
         for pid in points:
             hashkey = self.get_key_raw(pid)
-            if self._wrapper(self.conn.zremrangebyscore,
-                             (hashkey, 0, cur_ts)) is False:
-                return False
+            # always return a number of records deleted. i.e. >= 0
+            self._wrapper(self.conn.zremrangebyscore, (hashkey, 0, cur_ts))
             delete_count += 1
         return delete_count
 
