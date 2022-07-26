@@ -20,12 +20,12 @@ class SLMPAgent:
         self.client = SLMPClient(
                 addr=self.IPAddr,
                 port=self.IPPort,
-                binary=True if target.Encode == "binary" else False,
-                ver=3 if target.PDUType == "ST" else 4,
-                tcp=False if target.Transport == "UDP" else True)
-        self.client.target.network = int(target.NetNo,16)
-        self.client.target.node = int(target.NodeNo,16)
-        self.client.target.dst_proc = int(target.DstProcNo,16)
+                binary=True if self.target.Encode == "binary" else False,
+                ver=3 if self.target.PDUType == "ST" else 4,
+                tcp=False if self.target.Transport == "UDP" else True)
+        self.client.target.network = int(self.target.NetNo,16)
+        self.client.target.node = int(self.target.NodeNo,16)
+        self.client.target.dst_proc = int(self.target.DstProcNo,16)
         self.client.target.drop = 0
         # fix DevCode
         dev_code = [i for i in DeviceCode if i.name == self.target.DevCode]
