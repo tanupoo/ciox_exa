@@ -16,8 +16,8 @@ def agent_worker(target, config):
         raise ValueError("unknown Protocol {x.Protocol}.")
     # start the main loop
     db = None
+    tag = f"Agent:{agent.target.TargetID}: "
     while True:
-        tag = f"Agent:{agent.target.TargetID}: "
         if db is None:
             # since db is set to None when the connection has been rejected.
             # see below.
