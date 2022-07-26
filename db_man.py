@@ -29,7 +29,7 @@ class DBConnector:
     def _wrapper(self, func, args, kwargs={}, msg=None):
         """
         wrapper to check the exceptions.
-        return the result, or False if any exceptions happens.
+        return the result, or raise an exception.
         """
         try:
             ret = func(*args, **kwargs)
