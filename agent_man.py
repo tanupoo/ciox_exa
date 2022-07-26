@@ -45,6 +45,7 @@ def agent_worker(target, config):
                 # through here internal loop and try to connect DB.
             else:
                 agent.logger.debug(f"{tag}posted data: {pdata}")
+        # sleep
         agent.logger.debug(f"{tag}sleep: {get_time_isoformat()}")
         time.sleep(get_sleep_time(agent.PullInterval))
 
