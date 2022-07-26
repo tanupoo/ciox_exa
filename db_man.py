@@ -129,11 +129,10 @@ class DBConnector:
         return_val = {}
         for pid in points:
             hashkey = self.get_key_raw(pid)
+            # always return a list even if any data don't exist.
             stored_data = self._wrapper(self.conn.zrange,
                                         (hashkey, 0, cur_ts),
                                         dict(byscore=True, withscores=True))
-            if stored_data is False:
-                return return_val
             pv = return_val.setdefault(pid, [])
             for xv in stored_data:
                 (ts,pid,val) = [v.decode() for v in xv[0].split(b",")]
