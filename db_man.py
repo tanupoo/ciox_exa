@@ -11,6 +11,9 @@ PREFIX_READY = "rdy:"
 
 class DBConnector:
 
+    class ConnectionError(Exception):
+        pass
+
     def __init__(self, db_info, config):
         """
         db_info: { "IPAddr": str, "IPPort": int }
@@ -32,7 +35,9 @@ class DBConnector:
             ret = func(*args, **kwargs)
         except redis.exceptions.ConnectionError as e:
             self.logger.error(e)
-            return False
+            raise self.ConnectionError(f"{e}")
+        except Exception as e:
+            raise
         else:
             if msg is not None:
                 self.logger.debug(msg)
