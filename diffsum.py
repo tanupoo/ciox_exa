@@ -25,7 +25,9 @@ Value        v.   v0    v1    v2    v3    v4    v5    v6    v7
         debug_print = print
     #
     data_size = len(data)
-    result = { "vsum_list": None, "rest_offset": None }
+    result = { "vsum_list": [], "rest_offset": 0 }
+    if len(data) == 0:
+        return result
     for offset,svt in enumerate(data):
         (s,v,t) = svt
         diff = s - get_sharp_timestamp(sumspan, s, prev=True)
@@ -37,8 +39,6 @@ Value        v.   v0    v1    v2    v3    v4    v5    v6    v7
             pass
     # 
     if 1 + offset == data_size:
-        result["vsum_list"] = []
-        result["rest_offset"] = 0
         return result
     """
     Now, we can start to integrate the diffs.
