@@ -8,8 +8,8 @@ class PointInfo(BaseModel):
     ValueName: str
     Unit: str
     ValueType: Literal["float", "int"] = "float"
-    ULimitRotationNumber: int = 100
-    Integration: bool = True
+    ULimitRotationNumber: Optional[int]
+    ProcessType: Optional[Literal["S", "I"]]
     IntegrationSpan: int = 1800
 
 class AuthCredBasic(BaseModel):
