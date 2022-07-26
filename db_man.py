@@ -104,8 +104,8 @@ class DBConnector:
             hashkey = self.get_key_raw(point_id)
             key = f"{ts},{point_id},{value}"
             self.logger.debug(f"ZADD: {hashkey}, {key}, {score}")
-            if self._wrapper(self.conn.zadd, (hashkey, {key: score})) is False:
-                return False
+            # always return 1
+            self._wrapper(self.conn.zadd, (hashkey, {key: score}))
             post_count += 1
         else:
             return post_count
