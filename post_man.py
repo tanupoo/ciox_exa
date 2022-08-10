@@ -100,8 +100,10 @@ def worker(server, config):
         config.logger.debug(f"{tag}resumed: {get_time_isoformat()}")
         db = DBConnector(config.QueDB, config)
         dataset = [db, server, db.get_data_ready]
+        # First, try to post READY data.
+        # If succeeded, then try to post RETX data.
+        # If failed, RETX data will not be posted.
         if try_post_data(db.get_data_ready) is True:
-            # only successful.
             try_post_data(db.get_data_retx)
         config.logger.debug(f"{tag}sleep: {get_time_isoformat()}")
         time.sleep(get_sleep_time(server.PostInterval))
