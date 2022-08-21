@@ -36,11 +36,13 @@ def worker(server, config):
             for pid,svt in psvt.items():
                 config.logger.debug(f"{tag}{pid}: {len(svt)} data exist.")
                 if len(svt) > 0:
-                    if config.Points[pid].IntegrationSpan > 0:
-                        sumspan = config.Points[pid].IntegrationSpan
+                    pinfo = config.Points[pid]
+                    if pinfo.IntegrationSpan > 0:
+                        sumspan = pinfo.IntegrationSpan
                         ret = diffsum_timespan_sharp(
                                 svt, sumspan=sumspan,
                                 margin=server.IntegrationMarginTime,
+                                ulimit=pinfo.ULimitRotationNumber,
                                 config=config)
                         vsum_list = ret["vsum_list"]
                         rest_offset = ret["rest_offset"]
