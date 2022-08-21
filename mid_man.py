@@ -76,7 +76,7 @@ def worker(server, config):
         # sleep
         config.logger.debug(f"{tag}sleep: {get_time_isoformat()}")
         time.sleep(get_sleep_time(server.PostInterval,
-                                  server.IntegrationMarginTime))
+                                  server.IntegrationDeferTime))
 
 def start_wokers(config):
     workers = []
