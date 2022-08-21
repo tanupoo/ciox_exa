@@ -75,13 +75,18 @@ def worker(server, config):
                 config.logger.error(f"{tag}system error, "
                             f"{server.ServerID}, {e}")
             else:
-                if resp.status_code == requests.codes.ok:
-                    config.logger.debug(f"{tag}submission successful.")
+                if resp.ok:
+                    config.logger.debug(f"{tag}submission successful with code "
+                                        f"{resp.status_code}.")
                     success = True
                 else:
-                    config.logger.error(f"{tag}submission failed with code {resp.status_code}.")
+                    config.logger.error(f"{tag}submission failed with code"
+                                        f"{resp.status_code} {resp.json()}.")
             # post the data for retrying
-            if success is not True:
+            if success is True:
+                # interval for the next data.
+                time.sleep(1)
+            else:
                 try:
                     db.post_data_retx(server.ServerID, data)
                 except db.ConnectionError as e:
@@ -90,9 +95,6 @@ def worker(server, config):
                     config.logger.debug(f"{tag}posted data to retry queue: {data}")
                 # stop the process if any error occured.
                 return False
-            else:
-                # interval for the next data.
-                time.sleep(1)
         return True
 
     # main loop
