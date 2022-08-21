@@ -6,10 +6,11 @@ def diffsum_timespan_sharp(data, sumspan=300, margin=10,
     data: [ (score(timestamp), value, isoformat), ... ]
     sumspan: span in seconds to integrate the diff values.
     margin: margin in seconds, which allows the delay of sampleing timestamp.
-    ulimit: upper limit is not None, and
+    ulimit: upper limit.  The value never reach ulimit.
+        if it is not None, and
         if a data is more than ulimit, the data is ignored.
         if the data A is bigger than the next one B, diff woul be:
-            diff = 1 + ulimit - A + B
+            diff = ulimit - A + B
 
     return: { "vsum_list": [ value1, ... ], "rest_offset": rest_data_offset }
         rest_data_offset := None: no data remained.
@@ -52,7 +53,7 @@ Value        v.   v0    v1    v2    v3    v4    v5    v6    v7
     """
     def get_diff_ulimit(v0, v1, ulimit=0):
         if v0 > v1:
-            return 1 + ulimit - v0 + v1
+            return ulimit - v0 + v1
         else:
             return v1 - v0
     #
