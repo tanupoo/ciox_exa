@@ -36,14 +36,17 @@ class SLMPAgent:
         self.target.DevCode = dev_code[0]
 
     def pull(self):
-        self.client.open()
-        result = self.client.read_word_devices(
-                self.target.DevCode,
-                start_num=self.target.ReadStart,
-                count=self.target.ReadCount,
-                timeout=self.target.Timer,
-                )
-        self.client.close()
+        try:
+            self.client.open()
+            result = self.client.read_word_devices(
+                    self.target.DevCode,
+                    start_num=self.target.ReadStart,
+                    count=self.target.ReadCount,
+                    timeout=self.target.Timer,
+                    )
+        except:
+            self.client.close()
+            raise
         return result
 
 def slmp_start_agent(target, config):
