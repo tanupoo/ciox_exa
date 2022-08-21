@@ -36,8 +36,13 @@ def agent_worker(target, config):
                          f"{agent.IPAddr}:{agent.IPPort}, {e}")
         else:
             pdata = []
-            for p in agent.target.Points:
-                pdata.append(( p.PointID, result[p.Position-1] ))
+            try:
+                for p in agent.target.Points:
+                    pdata.append(( p.PointID, result[p.Position-1] ))
+            except IndexError as e:
+                agent.logger.error(f"{tag}"
+                                f"result length {len(result)} was too short "
+                                f"for Postion {p.Position}. Check ReadCount.")
             try:
                 db.post_data_raw(pdata)
             except db.ConnectionError as e:
