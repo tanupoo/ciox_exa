@@ -1,0 +1,106 @@
+{
+    "Points": {
+        "P0005215": {
+            "SiteName": "朝霞第3工場",
+            "Location": "第1ラインエリアC",
+            "DeviceName": "プレス機A",
+            "ValueName": "使用電力5分積算値",
+            "Unit": "kWh",
+            "IntegrationSpan": 300,
+            "ULimitRotationNumber": 100
+        },
+        "P0005216": {
+            "SiteName": "朝霞第3工場",
+            "Location": "第1ラインエリアB",
+            "DeviceName": "ロボットアームX",
+            "ValueName": "使用電力15分積算値",
+            "Unit": "kWh",
+            "IntegrationSpan": 30,
+            "ULimitRotationNumber": 100
+        },
+        "P0005217": {
+            "SiteName": "朝霞第3工場",
+            "Location": "第1ラインエリアB",
+            "DeviceName": "ロボットアームX",
+            "ValueName": "温度",
+            "Unit": "℃"
+        }
+    },
+    "Servers": [
+        {
+            "ServerID": "BOOOST-A",
+            "EPR": "https://sample.example.jp/",
+            "Version": "0",
+            "ServerAuthInfo": {
+                "CertRootChainFile": "/var/db/cert/cert.pem"
+            },
+            "ClientAuthInfo": {
+                "AuthType": "Basic",
+                "AuthInfo": {
+                    "Username": "alice",
+                    "Password": "great"
+                }
+            },
+            "IntegrationDeferTime": 10,
+            "IntegrationMarginTime": 2,
+            "PostInterval": 3600,
+            "Timeout": 15,
+            "Points": [
+                "PPP05015"
+            ]
+        },
+        {
+            "ServerID": "LOCAL",
+            "EPR": "http://127.0.0.1:8000/post",
+            "Version": "0",
+            "IntegrationDeferTime": 10,
+            "IntegrationMarginTime": 2,
+            "PostInterval": 60,
+            "Timeout": 15,
+            "Points": [
+                "PPP05016",
+                "PPP05017"
+            ]
+        }
+    ],
+    "Targets": [
+        {
+            "TargetID": "R120CPU-00123",
+            "Points": [
+                { "PointID": "PPP05015", "DeviceCode": "D", "Position": 1 }, 
+                { "PointID": "PPP05016", "DeviceCode": "D", "Position": 5 },
+                { "PointID": "PPP05017", "DeviceCode": "D", "Position": 10 }
+            ],
+            "Protocol": "SLMP",
+            "PullInterval": 5,
+            "RetryInterval": 1,
+            "RetryCount": 2,
+            "IPAddr": "127.0.0.1",
+            "IPPort": 1025,
+            "Transport":  "UDP",
+            "PDUType": "ST",
+            "Encode": "binary",
+            "NetNo": "0x00",
+            "NodeNo": "0xff",
+            "DstProcNo": "0x3fff",
+            "Timer": 4,
+            "Command": "0401",
+            "SubCommand": "0000",
+            "DevCode": "D",
+            "ReadStart": 1,
+            "ReadCount": 10
+        }
+    ],
+    "AgentDB": {
+        "IPAddr": "127.0.0.1",
+        "IPPort": 6379
+    },
+    "QueDB": {
+        "IPAddr": "127.0.0.1",
+        "IPPort": 6378
+    },
+    "EnableDebug": false,
+    "LogFile": "test.log",
+    "SyslogAddr": "127.0.0.1",
+    "SyslogPort": 8514
+}
