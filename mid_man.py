@@ -23,7 +23,7 @@ def worker(server, config):
         #
         config.logger.debug(f"{tag}resumed: {get_time_isoformat()}")
         cur_ts = get_time_now().timestamp()
-        # IntegrationDeferTime delays to start this process.
+        # server.IntegrationDeferTime delays to start this process.
         # So, cur_ts is enough to get the number of sampling data.
         try:
             psvt = db_agent.get_data_raw(server.Points, cur_ts)
@@ -36,7 +36,7 @@ def worker(server, config):
             for pid,svt in psvt.items():
                 config.logger.debug(f"{tag}{pid}: {len(svt)} data exist.")
                 if len(svt) > 0:
-                    if config.Points[pid].Integration is True:
+                    if config.Points[pid].IntegrationSpan > 0:
                         sumspan = config.Points[pid].IntegrationSpan
                         ret = diffsum_timespan_sharp(
                                 svt, sumspan=sumspan,
