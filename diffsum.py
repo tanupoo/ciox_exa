@@ -2,7 +2,7 @@ from time_util import get_sharp_timestamp, get_time_isoformat
 
 def diffsum_timespan_sharp(data, sumspan=300, margin=10, config=None):
     """
-    data: [ (scire(timestamp), value, isoformat), ... ]
+    data: [ (score(timestamp), value, isoformat), ... ]
     sumspan: span in seconds to integrate the diff values.
     margin: margin in seconds, which allows the delay of sampleing timestamp.
 
