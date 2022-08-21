@@ -77,7 +77,8 @@ def worker(server, config):
             else:
                 if resp.ok:
                     config.logger.debug(f"{tag}submission successful with code "
-                                        f"{resp.status_code}.")
+                                        f"{resp.status_code}. "
+                                        f"body={json.dumps(xd)}")
                     success = True
                 else:
                     config.logger.error(f"{tag}submission failed with code"
