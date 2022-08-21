@@ -16,8 +16,7 @@
             "Location": "第2開発室",
             "DeviceName": "",
             "ValueName": "室内温度",
-            "Unit": "℃",
-            "Integration": false
+            "Unit": "℃"
         }
     },
     "Servers": [
