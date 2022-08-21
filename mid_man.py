@@ -44,16 +44,23 @@ def worker(server, config):
                                 margin=server.IntegrationMarginTime,
                                 ulimit=pinfo.ULimitRotationNumber,
                                 config=config)
-                        vsum_list = ret["vsum_list"]
+                        values = ret["vsum_list"]
                         rest_offset = ret["rest_offset"]
-                        vx = PointDataWithTS(PointID=pid, Values=vsum_list,
-                                            TSLastValue=get_time_isoformat(ts=svt[rest_offset][0]))
-                        config.logger.debug(f"{tag}{pid}: {vx.Values} {vx.TSLastValue}")
-                        out_data.append(vx.dict())
-                        if rest_offset > 0:
-                            # Note: score - 1 is to leave the latest data.
-                            last_score = svt[rest_offset-1][0] - 1
-                            del_data.append((server.Points, last_score))
+                    else:
+                        values = [svt[-1][1]]
+                        rest_offset = 0
+                    # make data to post the queue db.
+                    tslast = get_time_isoformat(ts=svt[rest_offset][0])
+                    vx = PointDataWithTS(PointID=pid, Values=values,
+                                        TSLastValue=tslast)
+                    config.logger.debug(f"{tag}{pid}: {vx.Values} {vx.TSLastValue}")
+                    out_data.append(vx.dict())
+                    if rest_offset > 0:
+                        # Note: score - 1 is to leave the latest data.
+                        last_score = svt[rest_offset-1][0] - 1
+                    else:
+                        last_score = svt[-1][0]
+                    del_data.append((server.Points, last_score))
 
             # post data to the queue db.
             if len(out_data) > 0:
