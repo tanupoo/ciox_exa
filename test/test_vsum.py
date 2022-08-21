@@ -57,7 +57,7 @@ def make_data(nb_times, sample_span, basetime, nb_points):
             dt += timedelta(seconds=sample_span)
     return data
 
-def main(data, sumspan, margin, expected):
+def main(data, sumspan, margin, ulimit=None, expected=None):
     """
     data: see the return value of make_data()
     """
@@ -68,22 +68,22 @@ def main(data, sumspan, margin, expected):
     print()
     print(f"- Integ span = {sumspan//60} ({sumspan} sec), margin={margin} sec")
     for pid,svt_list in data.items():
-        vsum = diffsum_timespan_sharp(svt_list, sumspan, margin)
+        vsum = diffsum_timespan_sharp(svt_list, sumspan, margin, ulimit=ulimit)
         print(pid, vsum)
         print()
-        assert vsum == expected
-        #if vsum != expected:
-        #    raise ValueError(f"ERROR: {vsum} != {expected}")
+        if expected is not None:
+            assert vsum == expected
+            print("OK")
 
 def make_data_and_test(testv, expected):
     sample_span, nb_times, sumspan, margin, nb_points, basetime = testv
     print(f"- Sampl. span = {sample_span} sec, #of data = {nb_times}")
     data = make_data(nb_times, sample_span, basetime, nb_points)
-    main(data, sumspan, margin, expected)
+    main(data, sumspan, margin, expected=expected)
 
 def test_even():
     testv = [
-# sample_span, nb_times, sumspan, margin, nb_points
+# sample_span, nb_times, sumspan, margin, nb_points, basetime
 ( (10,  1, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
 ( (10,  2, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
 ( (10,  6, 60, 1, 1, "2022-07-07T12:30:00.123499+09:00"), {'vsum_list': [], 'rest_offset': 0} ),
@@ -127,7 +127,36 @@ def test_minus8sec():
         ]
     for i in range(0,8): make_data_and_test(*testv[i])
 
+def test_spec01():
+    """
+    ulimit: 5
+    """
+    data = {
+        "POINT-A": [
+            (1657164600.12402, 1, '2022-07-07T12:30:00+09:00'),
+            (1657164610.124393, 2, '2022-07-07T12:30:10+09:00'),
+            (1657164620.124447, 3, '2022-07-07T12:30:20+09:00'),
+            (1657164630.124367, 4, '2022-07-07T12:30:30+09:00'),
+            (1657164640.124285, 5, '2022-07-07T12:30:40+09:00'),
+            (1657164650.124345, 0, '2022-07-07T12:30:50+09:00'),
+            (1657164660.124247, 1, '2022-07-07T12:31:00+09:00'),
+            (1657164670.124073, 2, '2022-07-07T12:31:10+09:00'),
+            (1657164680.124468, 3, '2022-07-07T12:31:20+09:00'),
+            (1657164690.124215, 4, '2022-07-07T12:31:30+09:00'),
+            (1657164700.12401, 5, '2022-07-07T12:31:40+09:00'),
+            (1657164710.124428, 0, '2022-07-07T12:31:50+09:00'),
+            (1657164720.124043, 1, '2022-07-07T12:32:00+09:00'),
+            (1657164730.124458, 2, '2022-07-07T12:32:10+09:00'),
+        ]
+    }
+    expected = {'vsum_list': [6.0, 6.0], 'rest_offset': 12}
+    main(data, 60, 1, ulimit=5, expected=expected)
+
 if __name__ == "__main__":
-    test_even()
-    test_plus2sec()
-    test_minus8sec()
+    if len(sys.argv) > 1 and sys.argv[1].startswith("test_"):
+        eval(sys.argv[1])
+    else:
+        for func_name in sys.modules[__name__].__dir__():
+            if func_name.startswith("test_"):
+                print(f"## {func_name}")
+                eval(f"{func_name}()")
