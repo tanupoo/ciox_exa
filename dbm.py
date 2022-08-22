@@ -5,47 +5,70 @@ import redis
 
 def main(opt):
 
+    def get_kv(rkey):
+        ktype = con.type(rkey)
+        if ktype == b'zset':
+            for rv in con.zscan_iter(rkey):
+                (v, s) = rv
+                print(rkey.decode(), s, v.decode().split(","))
+        elif ktype == b'list':
+            for v in con.lrange(rkey, 0, -1):
+                print(rkey.decode(), v)
+        else:
+            print(con.type(rkey), rkey.decode())
+
     def get_each(iterator):
         for rkey in iterator:
-            ktype = con.type(rkey)
-            if ktype == b'zset':
-                for rv in con.zscan_iter(rkey):
-                    (v, s) = rv
-                    print(rkey.decode(), s, v.decode().split(","))
-            elif ktype == b'list':
-                for v in con.lrange(rkey, 0, -1):
-                    print(rkey.decode(), v)
-            else:
-                print(con.type(rkey), rkey.decode())
+            get_kv(rkey)
 
     con = redis.Redis(host=opt.ip_addr, port=opt.ip_port)
 
-    if opt.delete_name:
-        if "all" in opt.names:
-            print("ERROR: 'all' is not acceptable. use the -n option.")
-            exit(1)
-        for name in opt.names:
-            for k in con.scan_iter(f"{name}:*"):
-                n = con.delete(k)
-                print(f"{n} record deleted.")
-    else:
-        if "all" in opt.names:
-            get_each(con.scan_iter())
+    if opt.cmd == "size":
+        if opt.key is None:
+            print(con.dbsize())
         else:
+            print(con.memory_usage(opt.key))
+            #print(con.debug_object(opt.key))
+    elif opt.cmd == "delete":
+        if opt.key is None:
+            if "all" in opt.names:
+                print("ERROR: 'all' is not acceptable. use the -n option.")
+                exit(1)
             for name in opt.names:
-                get_each(con.scan_iter(f"{name}:*"))
+                for k in con.scan_iter(f"{name}:*"):
+                    n = con.delete(k)
+                    print(f"{k} deleted.")
+        else:
+            n = con.delete(k)
+            print(f"{k} deleted.")
+    elif opt.cmd == "show":
+        if opt.key is None:
+            if "all" in opt.names:
+                get_each(con.scan_iter())
+            else:
+                for name in opt.names:
+                    get_each(con.scan_iter(f"{name}:*"))
+        else:
+            get_kv(bytes(opt.key, "utf-8"))
+    else:
+        raise RuntimeError
 
 #
 # main
 #
-ap = ArgumentParser(description="redis viewer")
+commands = ["show", "delete", "size"]
+ap = ArgumentParser(description="redis DB manager.")
+ap.add_argument("cmd", metavar="CMD", nargs="?",
+                choices=commands,
+                default="show",
+                help=f"command {commands}")
 ap.add_argument("-n", action="store", dest="names",
                 default="all",
                 nargs="+",
                 choices=["all", "pt", "rdy", "retx"],
                 help="specify the category name list. e.g. -n rdy retx")
-ap.add_argument("--delete", action="store_true", dest="delete_name",
-                help="delete entries in the specified category")
+ap.add_argument("-k", action="store", dest="key",
+                help="specify a key")
 ap.add_argument("-a", action="store", dest="ip_addr",
                 default="127.0.0.1",
                 help="specify the ip address of the redis server.")
