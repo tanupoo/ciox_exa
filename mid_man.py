@@ -82,7 +82,7 @@ def worker(server, config):
                         pass
         # sleep
         sleep_time = get_sleep_time(server.PostInterval,
-                                  server.IntegrationDeferTime)
+                                    server.IntegrationDeferTime)
         config.logger.debug(f"{tag}sleep: {get_time_isoformat()}, "
                             f"resume in {sleep_time}.")
         time.sleep(sleep_time)
