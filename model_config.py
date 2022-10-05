@@ -45,7 +45,7 @@ class ServerInfo(BaseModel):
     ClientAuthInfo: Union[None,Dict,ClientAuthTypeInfo]
     PostTimeBase: str = "00:00:00"
     PostInterval: int = 21600
-    IntegrationDeferTime: int = 600
+    IntegrationDeferTime: int = 120
     IntegrationMarginTime: int = 30
     Timeout: int = 15
     Compression: bool = False
