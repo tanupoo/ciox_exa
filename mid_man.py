@@ -81,9 +81,11 @@ def worker(server, config):
                         # through here and try to connedt to the db next time.
                         pass
         # sleep
-        config.logger.debug(f"{tag}sleep: {get_time_isoformat()}")
-        time.sleep(get_sleep_time(server.PostInterval,
-                                  server.IntegrationDeferTime))
+        sleep_time = get_sleep_time(server.PostInterval,
+                                  server.IntegrationDeferTime)
+        config.logger.debug(f"{tag}sleep: {get_time_isoformat()}, "
+                            f"resume in {sleep_time}.")
+        time.sleep(sleep_time)
 
 def start_wokers(config):
     workers = []

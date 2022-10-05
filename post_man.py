@@ -108,8 +108,10 @@ def worker(server, config):
         # If failed, RETX data will not be posted.
         if try_post_data(db.get_data_ready) is True:
             try_post_data(db.get_data_retx)
-        config.logger.debug(f"{tag}sleep: {get_time_isoformat()}")
-        time.sleep(get_sleep_time(server.PostInterval))
+        sleep_time = get_sleep_time(server.PostInterval)
+        config.logger.debug(f"{tag}sleep: {get_time_isoformat()}, "
+                            f"resume in {sleep_time}.")
+        time.sleep(sleep_time)
 
 def start_wokers(config):
     workers = []

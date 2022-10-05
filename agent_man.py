@@ -51,8 +51,10 @@ def agent_worker(target, config):
             else:
                 agent.logger.debug(f"{tag}posted data: {pdata}")
         # sleep
-        agent.logger.debug(f"{tag}sleep: {get_time_isoformat()}")
-        time.sleep(get_sleep_time(agent.PullInterval))
+        sleep_time = get_sleep_time(agent.PullInterval)
+        agent.logger.debug(f"{tag}sleep: {get_time_isoformat()}, "
+                           f"resume in {sleep_time}.")
+        time.sleep(sleep_time)
 
 def start_wokers(config):
     workers = []
