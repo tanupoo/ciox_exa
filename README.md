@@ -14,3 +14,6 @@ A prototype for edge computing having below features:
 See README-ja.md written in Japanese.
 
 Please use any translator :)
+
+docker image builder for Cisco IOx ARM64v8 is [ready](https://github.com/tanupoo/ciox_exa-docker)
+
